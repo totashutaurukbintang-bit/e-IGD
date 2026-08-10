@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>e-IGD | Panduan Kegawatdaruratan Digital</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#667085;--primary:#0b63ce;--danger:#d92d20;--ok:#039855;--border:#e4e7ec}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:#0b3b78;color:#fff;padding:18px 20px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:22px}header p{margin:5px 0 0;font-size:13px;opacity:.85}
+nav{display:flex;gap:7px;overflow:auto;padding:10px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:74px;z-index:4}
+nav button{border:0;background:#eef4ff;color:#174ea6;padding:9px 12px;border-radius:20px;white-space:nowrap;cursor:pointer}
+nav button.active{background:var(--primary);color:#fff}
+main{max-width:1100px;margin:auto;padding:18px}.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 2px 7px #00000008}
+.card h3{margin-top:0}.muted{color:var(--muted);font-size:13px}.badge{display:inline-block;padding:5px 8px;border-radius:8px;font-size:12px;background:#eef4ff;color:#174ea6}
+.alert{border-left:4px solid var(--danger);background:#fff3f2;padding:12px;border-radius:8px;margin-bottom:14px}
+.ok{border-left-color:var(--ok);background:#ecfdf3}
+.btn{border:0;border-radius:9px;padding:10px 13px;background:var(--primary);color:#fff;cursor:pointer;margin:3px}
+.btn.secondary{background:#eef2f6;color:#344054}.btn.danger{background:var(--danger)}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin:5px 0 10px}
+.check{display:block;padding:9px;border-bottom:1px solid #eee}.check input{width:auto;margin-right:8px}
+.search{margin-bottom:14px}.hidden{display:none}.result{cursor:pointer}
+footer{padding:25px;text-align:center;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<h1>e-IGD</h1>
+<p>Panduan Assessment & Tindakan Awal Kegawatdaruratan Digital</p>
+</header>
+
+<nav id="nav">
+<button class="active" onclick="show('home',this)">Beranda</button>
+<button onclick="show('assessment',this)">Assessment</button>
+<button onclick="show('abcde',this)">ABCDE</button>
+<button onclick="show('bls',this)">BLS/CPR</button>
+<button onclick="show('resp',this)">Gangguan Napas</button>
+<button onclick="show('shock',this)">Syok</button>
+<button onclick="show('gcs',this)">GCS</button>
+<button onclick="show('codeblue',this)">Code Blue</button>
+<button onclick="show('checklist',this)">Checklist</button>
+<button onclick="show('ekg',this)">EKG</button>
+<button onclick="show('ekgRight',this)">EKG Kanan/Posterior</button>
+<button onclick="show('intubasi',this)">Intubasi</button>
+<button onclick="show('syringe',this)">Syringe Pump</button>
+<button onclick="show('defib',this)">Defibrilator</button>
+<button onclick="show('algoritma',this)">Algoritma BLS/ACLS/ATLS</button>
+<button onclick="show('hypo',this)">Hipoglikemia</button>
+<button onclick="show('hyper',this)">Hiperglikemia</button>
+<button onclick="show('seizure',this)">Kejang</button>
+<button onclick="show('shockTypes',this)">Jenis Syok</button>
+<button onclick="show('accident',this)">Kecelakaan/Trauma</button>
+<button onclick="show('search',this)">Pencarian</button>
+</nav>
+
+<main>
+<section id="home" class="page active">
+<div class="alert">⚠️ <b>Catatan keselamatan:</b> aplikasi ini adalah prototipe pendukung keputusan. Protokol final, obat, dosis, dan tindakan harus mengikuti SOP RS, kewenangan klinis, serta pedoman resmi yang berlaku.</div>
+<div class="grid">
+<div class="card"><h3>🚨 Assessment Awal</h3><p class="muted">Dokumentasikan kondisi awal dan prioritas pasien.</p><button class="btn" onclick="showById('assessment')">Buka</button></div>
+<div class="card"><h3>🫀 ABCDE</h3><p class="muted">Struktur penilaian primer secara sistematis.</p><button class="btn" onclick="showById('abcde')">Buka</button></div>
+<div class="card"><h3>❤️ BLS/CPR</h3><p class="muted">Checklist respons kegawatdaruratan.</p><button class="btn" onclick="showById('bls')">Buka</button></div>
+<div class="card"><h3>🧠 GCS</h3><p class="muted">Pencatatan komponen penilaian kesadaran.</p><button class="btn" onclick="showById('gcs')">Buka</button></div>
+</div>
+</section>
+
+<section id="assessment" class="page">
+<h2>Assessment Awal Pasien</h2>
+<div class="card">
+<label>Nama/Inisial Pasien<input id="patient"></label>
+<label>Waktu Assessment<input type="datetime-local" id="assessmentTime"></label>
+<label>Keluhan utama<textarea id="complaint" rows="3"></textarea></label>
+<label>Tanda vital / data awal<textarea id="vitals" rows="4" placeholder="Masukkan hasil sesuai pemeriksaan"></textarea></label>
+<label>Prioritas/triase<select><option>Pilih</option><option>Prioritas tinggi</option><option>Prioritas sedang</option><option>Prioritas rendah</option></select></label>
+<button class="btn" onclick="saveAssessment()">Simpan lokal</button>
+<button class="btn secondary" onclick="window.print()">Cetak</button>
+<p id="saveMsg" class="muted"></p>
+</div>
+</section>
+
+<section id="abcde" class="page">
+<h2>Primary Survey — ABCDE</h2>
+<div class="grid">
+<div class="card"><h3>A — Airway</h3><label class="check"><input type="checkbox">Assessment airway</label><label class="check"><input type="checkbox">Identifikasi ancaman airway</label><label class="check"><input type="checkbox">Catat temuan & tindakan sesuai SOP</label></div>
+<div class="card"><h3>B — Breathing</h3><label class="check"><input type="checkbox">Nilai pola dan kerja napas</label><label class="check"><input type="checkbox">Nilai oksigenasi sesuai fasilitas</label><label class="check"><input type="checkbox">Catat temuan & tindakan sesuai SOP</label></div>
+<div class="card"><h3>C — Circulation</h3><label class="check"><input type="checkbox">Nilai perfusi dan sirkulasi</label><label class="check"><input type="checkbox">Cari sumber perdarahan</label><label class="check"><input type="checkbox">Catat temuan & tindakan sesuai SOP</label></div>
+<div class="card"><h3>D — Disability</h3><label class="check"><input type="checkbox">Nilai kesadaran</label><label class="check"><input type="checkbox">Nilai pupil/neurologis sesuai indikasi</label><label class="check"><input type="checkbox">Periksa glukosa bila diindikasikan</label></div>
+<div class="card"><h3>E — Exposure</h3><label class="check"><input type="checkbox">Pemeriksaan menyeluruh sesuai kebutuhan</label><label class="check"><input type="checkbox">Pertahankan privasi & suhu pasien</label><label class="check"><input type="checkbox">Dokumentasikan temuan</label></div>
+</div>
+</section>
+
+<section id="bls" class="page">
+<h2>BLS / CPR</h2>
+<div class="alert">Gunakan algoritme BLS/CPR resmi yang berlaku di fasilitas Anda dan ikuti instruksi tenaga kesehatan terlatih.</div>
+<div class="card">
+<label class="check"><input type="checkbox">Pastikan keamanan lingkungan</label>
+<label class="check"><input type="checkbox">Nilai respons pasien</label>
+<label class="check"><input type="checkbox">Aktifkan sistem respons kegawatdaruratan sesuai SOP</label>
+<label class="check"><input type="checkbox">Nilai napas dan sirkulasi sesuai algoritme resmi</label>
+<label class="check"><input type="checkbox">Gunakan AED/defibrillator sesuai protokol dan kompetensi</label>
+<label class="check"><input type="checkbox">Dokumentasikan waktu dan intervensi</label>
+</div>
+</section>
+
+<section id="resp" class="page">
+<h2>Gangguan Napas</h2>
+<div class="grid">
+<div class="card"><h3>Assessment</h3><p>Nilai airway, pola/kerja napas, oksigenasi, suara napas, dan tanda kegawatan sesuai SOP.</p></div>
+<div class="card"><h3>Red Flags</h3><p>Perburukan kesadaran, kegagalan mempertahankan airway, tanda hipoksia, atau distress berat memerlukan eskalasi segera sesuai protokol RS.</p></div>
+<div class="card"><h3>Dokumentasi</h3><p>Catat temuan awal, monitoring, intervensi, respons pasien, dan waktu evaluasi ulang.</p></div>
+</div>
+</section>
+
+<section id="shock" class="page">
+<h2>Syok</h2>
+<div class="card">
+<p>Gunakan pendekatan sistematis untuk mengenali gangguan perfusi dan mencari penyebab yang mungkin. Prioritaskan assessment ABCDE, monitoring, identifikasi penyebab, dan eskalasi sesuai SOP rumah sakit.</p>
+<label class="check"><input type="checkbox">Nilai tanda perfusi</label>
+<label class="check"><input type="checkbox">Cari sumber perdarahan bila relevan</label>
+<label class="check"><input type="checkbox">Monitoring berkala</label>
+<label class="check"><input type="checkbox">Komunikasikan kondisi kepada tim</label>
+<label class="check"><input type="checkbox">Dokumentasikan respons terhadap intervensi</label>
+</div>
+</section>
+
+<section id="gcs" class="page">
+<h2>Glasgow Coma Scale</h2>
+<div class="card">
+<label>Eye (E)<select id="e"><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></label>
+<label>Verbal (V)<select id="v"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></label>
+<label>Motor (M)<select id="m"><option value="6">6</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></label>
+<button class="btn" onclick="calcGCS()">Hitung</button>
+<h3 id="gcsResult">GCS: —</h3>
+<p class="muted">Pastikan komponen E/V/M dipilih berdasarkan observasi klinis dan dokumentasikan respons yang sebenarnya.</p>
+</div>
+</section>
+
+<section id="codeblue" class="page">
+<h2>Code Blue</h2>
+<div class="alert">Aktivasi dan alur Code Blue harus mengikuti struktur komando serta SOP RSUD setempat.</div>
+<div class="card">
+<label class="check"><input type="checkbox">Kenali kegawatan dan aktifkan Code Blue</label>
+<label class="check"><input type="checkbox">Panggil tim/respons internal sesuai sistem RS</label>
+<label class="check"><input type="checkbox">Bawa perlengkapan emergensi sesuai SOP</label>
+<label class="check"><input type="checkbox">Tetapkan peran anggota tim</label>
+<label class="check"><input type="checkbox">Dokumentasikan waktu, tindakan, dan respons</label>
+<label class="check"><input type="checkbox">Lakukan evaluasi/debriefing setelah kejadian sesuai kebijakan</label>
+</div>
+</section>
+
+<section id="checklist" class="page">
+<h2>Checklist Tindakan</h2>
+<div class="card">
+<input id="newItem" placeholder="Tambah item checklist">
+<button class="btn" onclick="addItem()">Tambah</button>
+<div id="items"></div>
+</div>
+</section>
+
+
+<section id="ekg" class="page">
+<h2>📈 Panduan EKG 12-Lead</h2>
+<div class="alert">Dasar penempatan lead mengikuti standardisasi AHA/ACC/HRS. Pastikan posisi elektroda benar karena salah posisi dapat mengubah interpretasi EKG.</div>
+<div class="card">
+<h3>1. Persiapan</h3>
+<ol>
+<li>Verifikasi identitas pasien, indikasi, dan waktu pemeriksaan.</li>
+<li>Pasien beristirahat dan meminimalkan gerakan/berbicara selama perekaman.</li>
+<li>Pastikan kulit cukup bersih/kering dan kontak elektroda baik.</li>
+<li>Masukkan data pasien ke mesin bila tersedia.</li>
+</ol>
+</div>
+<div class="card">
+<h3>2. Penempatan elektroda prekordial</h3>
+<div class="grid">
+<div><b>V1</b><p>Sela iga ke-4, tepi sternum kanan.</p></div>
+<div><b>V2</b><p>Sela iga ke-4, tepi sternum kiri.</p></div>
+<div><b>V3</b><p>Di antara V2 dan V4.</p></div>
+<div><b>V4</b><p>Sela iga ke-5, garis midklavikula kiri.</p></div>
+<div><b>V5</b><p>Sejajar horizontal dengan V4, garis aksilaris anterior.</p></div>
+<div><b>V6</b><p>Sejajar horizontal dengan V4, garis midaksilaris.</p></div>
+</div>
+<p class="muted">Pada pasien dengan payudara, elektroda prekordial ditempatkan pada dinding dada sesuai landmark anatomi, bukan otomatis di atas jaringan payudara. Ikuti SOP setempat.</p>
+</div>
+<div class="card">
+<h3>3. Lead ekstremitas</h3>
+<p>Pasang elektroda ekstremitas secara simetris sesuai konfigurasi mesin. Yang penting adalah konsistensi posisi dan kualitas kontak. Untuk pemeriksaan diagnostik 12-lead, ikuti standar mesin dan SOP RS.</p>
+</div>
+<div class="card">
+<h3>4. Rekam & quality check</h3>
+<label class="check"><input type="checkbox">Verifikasi nama/ID dan waktu</label>
+<label class="check"><input type="checkbox">Pastikan baseline stabil dan artefak minimal</label>
+<label class="check"><input type="checkbox">Pastikan semua lead terbaca</label>
+<label class="check"><input type="checkbox">Periksa kemungkinan lead terbalik/posisi salah</label>
+<label class="check"><input type="checkbox">Simpan/cetak EKG dan dokumentasikan</label>
+</div>
+<div class="card">
+<h3>Interpretasi sistematis</h3>
+<p>Gunakan urutan: rate → rhythm → axis → interval PR/QRS/QTc → morfologi P/QRS → progresi R → ST → T → bandingkan EKG sebelumnya → korelasikan dengan klinis.</p>
+</div>
+</section>
+
+<section id="ekgRight" class="page">
+<h2>📈 EKG Kanan & Posterior</h2>
+<div class="alert">Lead tambahan digunakan bila ada indikasi klinis. Standardisasi AHA menyebut lead kanan V3R–V6R sebagai mirror-image lead prekordial, sedangkan lead posterior V7–V9 berada pada bidang horizontal V6.</div>
+<div class="card">
+<h3>EKG kanan — fokus ventrikel kanan</h3>
+<div class="grid">
+<div><b>V3R</b><p>Mirror image posisi V3 pada hemitoraks kanan.</p></div>
+<div><b>V4R</b><p>Mirror image V4 pada hemitoraks kanan; sering menjadi lead kanan yang paling penting secara klinis.</p></div>
+<div><b>V5R</b><p>Mirror image V5 kanan.</p></div>
+<div><b>V6R</b><p>Mirror image V6 kanan.</p></div>
+</div>
+<p>V1 dan V2 dapat dipahami sebagai ekuivalen dengan V2R dan V1R dalam konfigurasi kanan. Selalu beri label jelas pada rekaman.</p>
+</div>
+<div class="card">
+<h3>EKG posterior</h3>
+<div class="grid">
+<div><b>V7</b><p>Garis aksilaris posterior, pada bidang horizontal yang sama dengan V6.</p></div>
+<div><b>V8</b><p>Daerah di bawah/sekitar ujung inferior skapula, pada bidang horizontal V6.</p></div>
+<div><b>V9</b><p>Garis paravertebral kiri, pada bidang horizontal V6.</p></div>
+</div>
+</div>
+<div class="card">
+<h3>Checklist</h3>
+<label class="check"><input type="checkbox">Ada indikasi klinis untuk lead tambahan</label>
+<label class="check"><input type="checkbox">Landmark anatomi sudah ditentukan</label>
+<label class="check"><input type="checkbox">Lead diberi label sesuai posisi sebenarnya</label>
+<label class="check"><input type="checkbox">Bandingkan dengan EKG standar bila diperlukan</label>
+<label class="check"><input type="checkbox">Dokumentasikan indikasi dan temuan</label>
+</div>
+</section>
+
+<section id="intubasi" class="page">
+<h2>🫁 Panduan Intubasi Endotrakeal</h2>
+<div class="alert">Untuk tenaga kesehatan terlatih. Bagian ini mengikuti prinsip airway emergency: persiapan → preoksigenasi → optimasi → intubasi → konfirmasi → ventilasi → rencana rescue bila gagal. Gunakan SOP RS dan pelatihan airway sebagai acuan tindakan.</div>
+<div class="card">
+<h3>1. Indikasi & risiko</h3>
+<label class="check"><input type="checkbox">Nilai kegagalan oksigenasi/ventilasi atau ancaman airway</label>
+<label class="check"><input type="checkbox">Nilai kemungkinan difficult airway</label>
+<label class="check"><input type="checkbox">Identifikasi risiko aspirasi dan instabilitas hemodinamik</label>
+<label class="check"><input type="checkbox">Tentukan operator utama dan rencana rescue</label>
+</div>
+<div class="card">
+<h3>2. Persiapan</h3>
+<label class="check"><input type="checkbox">Monitoring lengkap dan akses sesuai kondisi</label>
+<label class="check"><input type="checkbox">Suction berfungsi</label>
+<label class="check"><input type="checkbox">Bag-mask ventilation tersedia</label>
+<label class="check"><input type="checkbox">Laryngoscope/video laryngoscope siap</label>
+<label class="check"><input type="checkbox">Tube, stylet/bougie, syringe, fiksasi siap</label>
+<label class="check"><input type="checkbox">Peralatan rescue airway siap</label>
+<label class="check"><input type="checkbox">Ventilator/alat ventilasi pasca-intubasi siap</label>
+</div>
+<div class="card">
+<h3>3. Preoksigenasi & optimasi</h3>
+<p>Untuk pasien hipoksemik, ACEP 2025 menyarankan NIV bila feasible untuk meningkatkan preoksigenasi; bila NIV tidak feasible, HFNC dapat dipertimbangkan. Video laryngoscopy dan apneic oxygenation juga dapat dipertimbangkan sesuai kondisi dan kompetensi.</p>
+</div>
+<div class="card">
+<h3>4. Intubasi & konfirmasi</h3>
+<ol>
+<li>Posisikan pasien dan operator secara optimal sesuai kondisi.</li>
+<li>Lakukan laringoskopi dengan teknik yang sesuai kompetensi.</li>
+<li>Masukkan ETT melalui visualisasi glotis bila memungkinkan.</li>
+<li>Konfirmasi posisi tube dengan kombinasi metode klinis dan, terutama, waveform capnography bila tersedia.</li>
+<li>Fiksasi tube dan dokumentasikan ukuran/kedalaman.</li>
+<li>Hubungkan ke ventilasi dan monitoring.</li>
+</ol>
+</div>
+<div class="card">
+<h3>5. Bila gagal</h3>
+<p>Jangan berulang kali melakukan percobaan tanpa perubahan strategi. Kembali ke oksigenasi/ventilasi, panggil bantuan, gunakan perangkat rescue sesuai algoritme difficult airway, dan eskalasi ke rencana airway berikutnya sesuai SOP.</p>
+</div>
+</section>
+
+<section id="syringe" class="page">
+<h2>💉 Syringe Pump</h2>
+<div class="alert">Pengaturan pompa harus mengikuti resep/order, konsentrasi obat, protokol RS, dan petunjuk pabrik. Jangan menggunakan kalkulator ini untuk menentukan dosis klinis tanpa verifikasi independen.</div>
+<div class="card">
+<h3>Checklist penggunaan</h3>
+<label class="check"><input type="checkbox">Verifikasi pasien, obat, konsentrasi, rute, dan order</label>
+<label class="check"><input type="checkbox">Periksa kondisi syringe, tubing, dan kompatibilitas alat</label>
+<label class="check"><input type="checkbox">Pastikan syringe terpasang dan terdeteksi benar</label>
+<label class="check"><input type="checkbox">Masukkan parameter sesuai order dan lakukan double-check</label>
+<label class="check"><input type="checkbox">Pastikan jalur tidak tertekuk/terlepas dan koneksi aman</label>
+<label class="check"><input type="checkbox">Aktifkan monitoring alarm dan respons terhadap alarm sesuai manual</label>
+<label class="check"><input type="checkbox">Dokumentasikan waktu mulai, parameter, dan perubahan</label>
+</div>
+</section>
+
+<section id="defib" class="page">
+<h2>⚡ Defibrilator Monofasik & Bifasik</h2>
+<div class="alert">Mengacu pada AHA 2025 Adult Advanced Life Support. Untuk defibrilasi, bifasik lebih disukai dibanding monofasik. Energi bifasik mengikuti rekomendasi pabrikan; bila tidak diketahui, AHA menyebut dosis maksimum perangkat dapat dipertimbangkan.</div>
+<div class="grid">
+<div class="card">
+<h3>Defibrilasi VF/pVT — Bifasik</h3>
+<ul>
+<li>Gunakan rekomendasi energi awal dari pabrikan (contoh algoritme AHA: 120–200 J).</li>
+<li>Jika energi pabrikan tidak diketahui, dapat dipertimbangkan energi maksimum perangkat.</li>
+<li>Shock berikutnya mengikuti rekomendasi perangkat; energi lebih tinggi dapat dipertimbangkan bila shock sebelumnya gagal.</li>
+</ul>
+</div>
+<div class="card">
+<h3>Defibrilasi VF/pVT — Monofasik</h3>
+<ul>
+<li>AHA 2025 mencantumkan 360 J untuk defibrilasi monofasik pada algoritme adult cardiac arrest.</li>
+<li>Gunakan perangkat sesuai petunjuk pabrikan dan SOP RS.</li>
+</ul>
+</div>
+</div>
+<div class="card">
+<h3>Pad placement & keselamatan</h3>
+<label class="check"><input type="checkbox">Pad menempel langsung pada kulit dan kontak baik</label>
+<label class="check"><input type="checkbox">Posisi anterolateral atau anteroposterior sesuai kondisi/perangkat</label>
+<label class="check"><input type="checkbox">CPR dilanjutkan sampai defibrilator siap, kecuali situasi yang memungkinkan shock segera sesuai algoritme</label>
+<label class="check"><input type="checkbox">Pastikan seluruh tim clear sebelum shock</label>
+<label class="check"><input type="checkbox">Minimalkan jeda kompresi sebelum dan sesudah shock</label>
+<label class="check"><input type="checkbox">Segera lanjutkan CPR dan reassessment sesuai algoritme</label>
+</div>
+<div class="card">
+<h3>Synchronized cardioversion</h3>
+<p>Berbeda dari defibrilasi unsynchronized pada VF/pVT. Pastikan mode <b>SYNC</b> aktif dan tanda sinkronisasi terlihat sebelum shock pada ritme yang memerlukan cardioversion, mengikuti algoritme dan kondisi pasien.</p>
+</div>
+</section>
+
+<section id="algoritma" class="page">
+<h2>🚨 Algoritma BLS • ACLS • ATLS</h2>
+<div class="alert">Basis utama: AHA Guidelines for CPR & ECC 2025 untuk BLS/ALS dan ACS ATLS 11 untuk trauma. Aplikasi ini adalah cognitive aid; algoritme resmi, SOP RS, dan pelatihan tersertifikasi tetap menjadi rujukan utama.</div>
+
+<div class="card">
+<h3>BLS Dewasa — AHA 2025</h3>
+<ol>
+<li>Pastikan keamanan lokasi dan kenali tidak respons.</li>
+<li>Aktifkan sistem respons kegawatdaruratan dan minta defibrilator/AED.</li>
+<li>Nilai napas dan tanda sirkulasi sesuai algoritme.</li>
+<li>Mulai CPR berkualitas tinggi bila henti jantung teridentifikasi.</li>
+<li>Kompresi dada: 100–120/menit, kedalaman minimal 5 cm pada dewasa, recoil penuh, interupsi seminimal mungkin.</li>
+<li>Tanpa advanced airway: rasio 30:2. Dengan advanced airway: ventilasi 1 kali setiap 6 detik dengan kompresi kontinu.</li>
+<li>Pasang AED/defibrilator secepat mungkin dan ikuti analisis ritme.</li>
+</ol>
+</div>
+
+<div class="card">
+<h3>ACLS — Adult Cardiac Arrest</h3>
+<ol>
+<li>CPR berkualitas tinggi + monitoring/defibrilator.</li>
+<li>Tentukan ritme: <b>shockable</b> (VF/pVT) atau <b>non-shockable</b> (asystole/PEA).</li>
+<li>VF/pVT: defibrilasi → CPR 2 menit → akses IV/IO → reassessment ritme → lanjutkan siklus sesuai algoritme.</li>
+<li>Asystole/PEA: CPR → epinephrine sesuai algoritme → cari dan tangani penyebab reversibel → reassessment.</li>
+<li>Advanced airway dapat dipertimbangkan; waveform capnography direkomendasikan untuk konfirmasi/monitoring posisi ETT bila tersedia.</li>
+<li>Gunakan Hs & Ts: hypovolemia, hypoxia, hydrogen ion/acidosis, hypo-/hyperkalemia, hypothermia; tension pneumothorax, tamponade, toxins, thrombosis pulmonary/coronary.</li>
+</ol>
+</div>
+
+<div class="card">
+<h3>ACLS — Bradycardia & Tachycardia</h3>
+<p><b>Bradycardia:</b> nilai apakah ada kompromi kardiopulmoner; lakukan dukungan dan terapi sesuai algoritme 2025. <b>Tachycardia:</b> tentukan stabil/tidak stabil, narrow/wide complex, regular/irregular, lalu pilih terapi sesuai algoritme. Cardioversion tersinkron digunakan pada kondisi tertentu.</p>
+</div>
+
+<div class="card">
+<h3>ATLS 11 — xABCDE</h3>
+<ol>
+<li><b>x — Exsanguinating external hemorrhage:</b> kenali dan kontrol perdarahan eksternal yang mengancam nyawa segera.</li>
+<li><b>A — Airway:</b> evaluasi airway sambil mempertimbangkan proteksi cervical spine sesuai mekanisme/risiko.</li>
+<li><b>B — Breathing:</b> identifikasi dan tangani segera ancaman ventilasi/oksigenasi yang mematikan.</li>
+<li><b>C — Circulation:</b> nilai perfusi, perdarahan internal, akses dan resusitasi sesuai kondisi.</li>
+<li><b>D — Disability:</b> evaluasi neurologis cepat dan glukosa sesuai indikasi.</li>
+<li><b>E — Exposure/Environment:</b> buka area yang diperlukan untuk pemeriksaan menyeluruh sambil mencegah hipotermia.</li>
+<li>Lanjutkan secondary survey setelah ancaman hidup pada primary survey ditangani.</li>
+<li>Evaluasi kebutuhan transfer ke pusat trauma yang sesuai bila kemampuan fasilitas tidak mencukupi.</li>
+</ol>
+</div>
+
+<div class="card">
+<h3>Mode belajar aplikasi</h3>
+<p>Setiap algoritme sebaiknya dibuat dalam tiga tampilan: <b>Flowchart</b> → <b>Checklist tindakan</b> → <b>Dokumentasi waktu/intervensi</b>. Ini akan membuat aplikasi lebih cocok sebagai cognitive aid di IGD.</p>
+</div>
+</section>
+
+
+<section id="hypo" class="page">
+<h2>🩸 Tatalaksana Awal Hipoglikemia</h2>
+<div class="alert">Basis: ADA Standards of Care 2026. Hipoglikemia didefinisikan sebagai glukosa <b>&lt;70 mg/dL</b>. Tata laksana harus disesuaikan dengan kesadaran, kemampuan menelan, akses IV, penyebab, dan SOP rumah sakit.</div>
+<div class="card">
+<h3>1. Kenali & nilai</h3>
+<label class="check"><input type="checkbox">Ukur glukosa kapiler segera bila tersedia</label>
+<label class="check"><input type="checkbox">Nilai ABCDE dan tingkat kesadaran</label>
+<label class="check"><input type="checkbox">Cari penyebab: obat antidiabetes/insulin, asupan kurang, aktivitas, penyakit akut, alkohol, dll.</label>
+<label class="check"><input type="checkbox">Periksa ulang glukosa setelah terapi sesuai protokol RS</label>
+</div>
+<div class="card">
+<h3>2. Bila sadar & mampu menelan</h3>
+<p>Berikan sumber glukosa oral yang cepat diserap sesuai protokol hipoglikemia RS, kemudian lakukan pemeriksaan ulang. Setelah pulih, pastikan ada rencana mencegah kekambuhan dan pertimbangkan sumber karbohidrat/meal berikutnya sesuai kondisi.</p>
+</div>
+<div class="card">
+<h3>3. Bila tidak mampu menelan / penurunan kesadaran</h3>
+<p>Jangan berikan makanan/minuman melalui mulut. Aktifkan bantuan, amankan airway, dan berikan terapi parenteral sesuai protokol RS serta akses yang tersedia. Glukagon merupakan pilihan bila akses IV tidak tersedia pada keadaan tertentu.</p>
+</div>
+<div class="card">
+<h3>4. Setelah koreksi</h3>
+<label class="check"><input type="checkbox">Dokumentasikan episode dan terapi</label>
+<label class="check"><input type="checkbox">Cari penyebab dan koreksi faktor pencetus</label>
+<label class="check"><input type="checkbox">Pantau hipoglikemia berulang sesuai obat/penyebab</label>
+</div>
+</section>
+
+<section id="hyper" class="page">
+<h2>🩸 Tatalaksana Awal Hiperglikemia / DKA / HHS</h2>
+<div class="alert">Hiperglikemia di rumah sakit bukan otomatis DKA/HHS. Bedakan hiperglikemia tanpa krisis dari DKA/HHS melalui kondisi klinis, glukosa, keton, elektrolit, fungsi ginjal, dan status asam-basa sesuai protokol.</div>
+<div class="card">
+<h3>1. Assessment awal</h3>
+<label class="check"><input type="checkbox">ABCDE dan tanda dehidrasi/hipoperfusi</label>
+<label class="check"><input type="checkbox">Glukosa darah</label>
+<label class="check"><input type="checkbox">Elektrolit dan fungsi ginjal sesuai indikasi</label>
+<label class="check"><input type="checkbox">Keton/β-hydroxybutyrate bila curiga DKA</label>
+<label class="check"><input type="checkbox">Status asam-basa bila dicurigai krisis hiperglikemik</label>
+<label class="check"><input type="checkbox">Cari pencetus: infeksi, penghentian insulin, MI/stroke, obat, dll.</label>
+</div>
+<div class="card">
+<h3>2. DKA/HHS</h3>
+<p>Prinsip utama meliputi resusitasi cairan yang sesuai kondisi, koreksi elektrolit terutama kalium, terapi insulin sesuai protokol, pemantauan glukosa dan parameter metabolik serial, serta terapi penyebab pencetus. Hindari pemberian insulin tanpa memperhatikan status kalium sesuai protokol.</p>
+</div>
+<div class="card">
+<h3>3. Monitoring</h3>
+<p>Monitor hemodinamik, status neurologis, input-output, glukosa, elektrolit, keton/asam-basa, dan komplikasi terapi. DKA/HHS memerlukan protokol rumah sakit yang terstandardisasi.</p>
+</div>
+</section>
+
+<section id="seizure" class="page">
+<h2>🧠 Tatalaksana Awal Kejang — Anak & Dewasa</h2>
+<div class="alert">Kejang aktif yang berkepanjangan adalah kegawatdaruratan. Prioritas awal: keselamatan, airway/breathing/circulation, glukosa, penghentian kejang dengan terapi lini pertama sesuai protokol, lalu terapi lini berikutnya bila berlanjut.</div>
+<div class="card">
+<h3>1. Saat kejang berlangsung</h3>
+<label class="check"><input type="checkbox">Lindungi pasien dari cedera; jangan memasukkan benda ke mulut</label>
+<label class="check"><input type="checkbox">Posisikan dan jaga airway sesuai kondisi</label>
+<label class="check"><input type="checkbox">Berikan oksigen/ventilasi bila diperlukan sesuai monitoring</label>
+<label class="check"><input type="checkbox">Periksa glukosa dan koreksi hipoglikemia bila ada</label>
+<label class="check"><input type="checkbox">Catat waktu mulai kejang</label>
+</div>
+<div class="card">
+<h3>2. Status epileptikus / kejang berkepanjangan</h3>
+<p>Benzodiazepin adalah terapi lini pertama. Bila kejang tetap berlangsung setelah terapi lini pertama yang adekuat, terapi lini kedua seperti levetiracetam, fosphenytoin/phenytoin, atau valproate dapat dipilih sesuai usia, kontraindikasi, ketersediaan, dan protokol. Status refrakter memerlukan eskalasi dan airway/ICU management.</p>
+</div>
+<div class="grid">
+<div class="card"><h3>Anak</h3><p>Gunakan dosis berbasis berat badan dan batas maksimum sesuai protokol pediatrik RS. Pastikan konsentrasi sediaan dan rute benar.</p></div>
+<div class="card"><h3>Dewasa</h3><p>Gunakan algoritme status epileptikus dewasa dan perhatikan gangguan napas, penyebab metabolik, toksik, stroke, infeksi, atau penghentian obat antikejang.</p></div>
+</div>
+<div class="card">
+<h3>3. Setelah kejang</h3>
+<label class="check"><input type="checkbox">Reassessment ABCDE dan kesadaran</label>
+<label class="check"><input type="checkbox">Cari etiologi dan faktor pencetus</label>
+<label class="check"><input type="checkbox">Pertimbangkan pemeriksaan penunjang sesuai klinis</label>
+<label class="check"><input type="checkbox">Dokumentasikan durasi, karakter kejang, terapi, dan respons</label>
+</div>
+</section>
+
+<section id="shockTypes" class="page">
+<h2>🫀 Tatalaksana Awal Berbagai Jenis Syok</h2>
+<div class="alert">Semua syok dimulai dengan pengenalan cepat, ABCDE, monitoring, akses vaskular sesuai kebutuhan, evaluasi perfusi, dan mencari penyebab. Cairan/vasopresor harus disesuaikan dengan tipe syok dan kondisi pasien.</div>
+<div class="grid">
+<div class="card">
+<h3>Syok Hipovolemik</h3>
+<ol>
+<li>Kontrol sumber kehilangan cairan/darah.</li>
+<li>ABCDE, monitoring, akses vaskular, dan pemeriksaan penunjang sesuai kondisi.</li>
+<li>Pada perdarahan, prioritaskan kontrol perdarahan dan resusitasi darah sesuai protokol trauma/perdarahan RS.</li>
+<li>Hindari overload cairan; lakukan reassessment perfusi berulang.</li>
+</ol>
+</div>
+<div class="card">
+<h3>Syok Kardiogenik</h3>
+<ol>
+<li>Kenali hipoperfusi akibat kegagalan pompa jantung.</li>
+<li>Monitoring EKG, tekanan darah, oksigenasi, perfusi, dan tanda kongesti.</li>
+<li>Hindari pemberian cairan besar secara empiris; berikan secara selektif berdasarkan kondisi.</li>
+<li>Cari dan tangani penyebab, termasuk sindrom koroner akut/aritmia, serta eskalasi ke tim kritis/kardiologi.</li>
+</ol>
+</div>
+<div class="card">
+<h3>Syok Neurogenik</h3>
+<ol>
+<li>Anggap trauma spinal sampai terbukti sebaliknya bila mekanisme mendukung.</li>
+<li>Prioritaskan airway, breathing, dan perfusi dengan proteksi spinal sesuai indikasi.</li>
+<li>Bedakan dari perdarahan karena trauma; hipotensi disertai bradikardia dapat mendukung neurogenic shock.</li>
+<li>Resusitasi dan vasopresor sesuai protokol trauma/spinal cord injury serta monitoring ketat.</li>
+</ol>
+</div>
+<div class="card">
+<h3>Syok Sepsis</h3>
+<ol>
+<li>Kenali sepsis sebagai kegawatdaruratan dan mulai resusitasi segera.</li>
+<li>Ambil kultur darah secepat mungkin dan idealnya sebelum antimikroba bila tidak menunda terapi.</li>
+<li>Ukur laktat bila sesuai.</li>
+<li>Berikan kristaloid dan reassessment berkala; SSC 2026 menyarankan strategi cairan yang individual dan guided by response.</li>
+<li>Norepinefrin adalah vasopresor lini pertama pada septic shock.</li>
+<li>Kontrol sumber infeksi dan berikan antimikroba segera sesuai protokol.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section id="accident" class="page">
+<h2>🚑 Tatalaksana Awal Kecelakaan / Trauma</h2>
+<div class="alert">Mengikuti prinsip ATLS 11: <b>xABCDE</b>. Perdarahan eksternal yang mengancam nyawa dikontrol terlebih dahulu sebelum melanjutkan primary survey.</div>
+<div class="card">
+<h3>x — Exsanguinating hemorrhage</h3>
+<label class="check"><input type="checkbox">Identifikasi perdarahan eksternal masif</label>
+<label class="check"><input type="checkbox">Kontrol segera dengan metode yang sesuai lokasi dan jenis perdarahan</label>
+<label class="check"><input type="checkbox">Aktifkan protokol transfusi/trauma bila memenuhi kriteria RS</label>
+</div>
+<div class="card">
+<h3>A — Airway + proteksi cervical spine</h3>
+<label class="check"><input type="checkbox">Nilai kemampuan mempertahankan airway</label>
+<label class="check"><input type="checkbox">Identifikasi obstruksi/cedera wajah-leher</label>
+<label class="check"><input type="checkbox">Proteksi tulang belakang servikal sesuai mekanisme dan temuan</label>
+</div>
+<div class="card">
+<h3>B — Breathing</h3>
+<p>Evaluasi oksigenasi, ventilasi, suara napas, dan cedera dada yang mengancam nyawa. Tangani segera sesuai kompetensi dan protokol trauma.</p>
+</div>
+<div class="card">
+<h3>C — Circulation</h3>
+<p>Nilai perfusi dan sumber perdarahan internal/eksternal. Gunakan akses dan resusitasi sesuai protokol trauma, termasuk strategi blood product bila tersedia dan diindikasikan.</p>
+</div>
+<div class="card">
+<h3>D — Disability</h3>
+<p>Nilai kesadaran, pupil, defisit neurologis, dan glukosa bila relevan. Dokumentasikan perubahan neurologis serial.</p>
+</div>
+<div class="card">
+<h3>E — Exposure / Environment</h3>
+<p>Lakukan pemeriksaan menyeluruh untuk mencari cedera tersembunyi sambil mencegah hipotermia dan menjaga privasi pasien.</p>
+</div>
+<div class="card">
+<h3>Secondary survey</h3>
+<p>Setelah ancaman hidup ditangani: riwayat terarah, pemeriksaan head-to-toe, pemeriksaan penunjang sesuai indikasi, reassessment berulang, serta keputusan transfer bila kebutuhan pasien melebihi kapasitas fasilitas.</p>
+</div>
+</section>
+
+<section id="search" class="page">
+<h2>Pencarian Cepat</h2>
+<input class="search" id="searchBox" placeholder="Cari: ABCDE, GCS, Code Blue, gangguan napas..." oninput="searchContent()">
+<div id="results" class="grid"></div>
+</section>
+</main>
+
+<footer>e-IGD Prototype v2 • Modul alat & algoritme • Untuk pengembangan internal • Validasi klinis dan legal diperlukan sebelum implementasi.</footer>
+
+<script>
+const pages={
+abcde:"ABCDE — primary survey: airway, breathing, circulation, disability, exposure.",
+bls:"BLS/CPR — checklist respons kegawatdaruratan dan dokumentasi.",
+resp:"Gangguan napas — assessment, red flags, monitoring, eskalasi.",
+shock:"Syok — assessment perfusi, penyebab, monitoring, dokumentasi.",
+gcs:"GCS — pencatatan Eye, Verbal, Motor.",
+codeblue:"Code Blue — aktivasi sistem, pembagian peran, dokumentasi.",
+assessment:"Assessment awal — data pasien, keluhan, tanda vital, prioritas.",
+ekg:"EKG — penggunaan alat, lead, kualitas tracing, dokumentasi.",
+ekgRight:"EKG kanan/posterior — lead tambahan dan dokumentasi.",
+intubasi:"Intubasi — checklist persiapan, airway, konfirmasi, monitoring.",
+syringe:"Syringe pump — verifikasi order, setup, alarm, dokumentasi.",
+defib:"Defibrilator — monofasik, bifasik, keselamatan, dokumentasi.",
+algoritma:"Algoritma BLS, ACLS, ATLS — alur xABCDE, cardiac arrest, bradycardia, tachycardia, defibrillation.",
+hypo:"Hipoglikemia — definisi, assessment, glukosa oral, terapi parenteral, monitoring.",
+hyper:"Hiperglikemia DKA HHS — assessment, cairan, insulin, kalium, monitoring.",
+seizure:"Kejang anak dewasa — status epileptikus, benzodiazepin, terapi lini kedua, monitoring.",
+shockTypes:"Syok hipovolemik, kardiogenik, neurogenik, sepsis — assessment dan tatalaksana awal.",
+accident:"Kecelakaan trauma — ATLS 11 xABCDE, perdarahan, airway, breathing, circulation, disability, exposure."
+};
+function show(id,btn){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+ if(btn) btn.classList.add('active');
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function showById(id){
+ const b=[...document.querySelectorAll('nav button')].find(x=>x.getAttribute('onclick')?.includes("'"+id+"'"));
+ show(id,b);
+}
+function calcGCS(){
+ const total=+e.value + +v.value + +m.value;
+ document.getElementById('gcsResult').textContent=`GCS: ${total} (E${e.value} V${v.value} M${m.value})`;
+}
+function saveAssessment(){
+ const data={patient:patient.value,time:assessmentTime.value,complaint:complaint.value,vitals:vitals.value,created:new Date().toISOString()};
+ localStorage.setItem('eigd_assessment',JSON.stringify(data));
+ saveMsg.textContent='Data tersimpan di perangkat ini (local storage).';
+}
+function addItem(){
+ const val=newItem.value.trim(); if(!val)return;
+ const row=document.createElement('label'); row.className='check';
+ row.innerHTML=`<input type="checkbox"> ${val}`;
+ items.appendChild(row); newItem.value='';
+}
+function searchContent(){
+ const q=searchBox.value.toLowerCase();
+ results.innerHTML='';
+ Object.entries(pages).filter(([k,v])=>(k+' '+v).toLowerCase().includes(q)).forEach(([k,v])=>{
+  const d=document.createElement('div'); d.className='card result';
+  d.innerHTML=`<span class="badge">${k.toUpperCase()}</span><h3>${k}</h3><p>${v}</p>`;
+  d.onclick=()=>showById(k); results.appendChild(d);
+ });
+}
+searchContent();
+</script>
+</body>
+</html>
